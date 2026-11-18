@@ -8,4 +8,13 @@
     <InvariantGlobalization>false</InvariantGlobalization>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Plain SQL migrations, applied in file-name order by MigrationRunner. -->
+    <EmbeddedResource Include="Database/Migrations/*.sql" />
+  </ItemGroup>
+
 </Project>

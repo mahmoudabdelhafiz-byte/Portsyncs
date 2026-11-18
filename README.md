@@ -43,6 +43,28 @@ curl http://localhost:8080/api/v1/tools/container/MSKU0496560/validate
 
 Redis and RabbitMQ start only with `docker compose --profile full up`, once their providers are implemented.
 
+The API applies the SQL migrations in `backend/src/PortSyncs.Api/Database/Migrations/` on startup.
+
+### Try the fleet API (T26), local only
+
+Set `DEV_ENDPOINTS=true` in `deploy/.env`. These endpoints have no login yet (T20), so **never enable them on a server with real data**.
+
+```bash
+# Sign up a trucking company
+curl -X POST localhost:8080/api/v1/companies -H 'Content-Type: application/json' \
+  -d '{"name":"Al Noor Transport","country":"SA","adminName":"Ahmed","adminPhone":"+966501234567"}'
+
+# Add a truck and a driver (use the id returned above)
+curl -X POST localhost:8080/api/v1/companies/<orgId>/trucks -H 'Content-Type: application/json' \
+  -d '{"plateCountry":"SA","plate":"1234 ABC"}'
+curl -X POST localhost:8080/api/v1/companies/<orgId>/drivers -H 'Content-Type: application/json' \
+  -d '{"name":"Ali","phone":"+966500000001"}'
+
+# Assign the driver to the truck
+curl -X POST localhost:8080/api/v1/companies/<orgId>/trucks/<truckId>/assign -H 'Content-Type: application/json' \
+  -d '{"driverId":"<driverId>"}'
+```
+
 ## Principles
 
 - **Portable from day one:** all settings in environment variables; storage, queue, cache and maps behind interfaces, so moving from the VPS (H1) to Azure/AWS (H2/H3) is a redeploy.

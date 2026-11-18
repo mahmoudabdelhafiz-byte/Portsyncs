@@ -1,6 +1,8 @@
 # Data model (T13, T14) and roles (T16) — draft v0.1
 
-PostgreSQL + PostGIS. Every tenant-owned row carries `tenant_id`. IDs are UUIDs (shown with prefixes here for readability only).
+PostgreSQL + PostGIS. Every tenant-owned row carries its owning organization (`organization_id`), which is the tenant.
+
+Implemented so far: `backend/src/PortSyncs.Api/Database/Migrations/0001_core_fleet.sql` (organizations, users, memberships, drivers, trucks, truck assignments, files, audit log). IDs are UUIDs (shown with prefixes here for readability only).
 
 ## Organizations and people (T13)
 
@@ -88,6 +90,6 @@ Enforced in two layers: application authorization per request, plus PostgreSQL r
 
 ## Open questions
 
-- [ ] Owner-operators: one-truck organization, or a lighter "independent driver" account?
+- [ ] Owner-operators: one-truck organization, or a lighter "independent driver" account? **Working assumption:** a one-truck `trucking_company` organization, so no special case in the code.
 - [ ] Should depots see container tracking status for expected visits?
 - [ ] Retention periods per table, per country (with T38 and T69).

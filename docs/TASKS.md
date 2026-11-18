@@ -40,7 +40,7 @@ Gates:
 | ID | Task | Workstream | Status | Priority | Depends on | Notes |
 |---|---|---|---|---|---|---|
 | T12 | Define the standard event model | Architecture | In progress | High | | Draft: [docs/architecture/event-model.md](architecture/event-model.md) |
-| T13 | Core data model: trucks, drivers, companies, terminals, depots, users | Architecture | In progress | High | T12 | Draft: [docs/architecture/data-model.md](architecture/data-model.md) |
+| T13 | Core data model: trucks, drivers, companies, terminals, depots, users | Architecture | In progress | High | T12 | Draft: [docs/architecture/data-model.md](architecture/data-model.md); first migration `0001_core_fleet.sql` |
 | T14 | Case data model: violation and damage types, severity, evidence, survey, dispute, status | Architecture | In progress | High | T12 | Draft: [docs/architecture/data-model.md](architecture/data-model.md) |
 | T15 | Tech stack and hosting decision | Architecture | Done | High | | Flutter, ASP.NET Core modular monolith, React, PostgreSQL + PostGIS, Redis |
 | T16 | Roles and multi-tenant security model | Architecture | In progress | High | T13 | Draft: [docs/architecture/data-model.md](architecture/data-model.md#roles-and-tenancy-t16) |
@@ -53,7 +53,7 @@ Gates:
 | T23 | Navigation hand-off to the Google Maps or Waze app | Driver app | To do | Medium | T20 | No in-app map cost |
 | T24 | Case inbox: view violations and damages, reply | Driver app | To do | High | T14, T20 | |
 | T25 | Multi-language UI with right-to-left support (Arabic and English first) | Driver app | To do | High | T17 | Languages are country settings (T64) |
-| T26 | Company sign-up, fleet and driver management | Company portal | To do | High | T16, T18 | |
+| T26 | Company sign-up, fleet and driver management | Company portal | In progress | High | T16, T18 | API in `Modules/Fleet` (dev-only until T20 login); portal UI pending |
 | T27 | Live fleet map (free up to 10–15 trucks, 7-day history) | Company portal | To do | High | T21, T26 | |
 | T28 | Case management: acknowledge, accept or dispute with evidence | Company portal | To do | High | T14, T26 | |
 | T29 | Dispatcher users and escalation contacts | Company portal | To do | High | T26 | |

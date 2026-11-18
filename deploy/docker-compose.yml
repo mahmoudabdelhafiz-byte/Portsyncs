@@ -13,6 +13,8 @@ services:
       Storage__Provider: Local
       Storage__LocalRoot: /data/files
       Messaging__Provider: InProcess
+      Database__MigrateOnStartup: "true"
+      Features__DevEndpoints: ${DEV_ENDPOINTS:-false}
     volumes:
       - files:/data/files
     depends_on:
