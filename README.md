@@ -78,3 +78,28 @@ curl localhost:8080/api/v1/me -H "Authorization: Bearer $TOKEN"
 When the driver (+966500000001) logs in with their own code, they are linked to the company automatically with the `driver` role.
 
 Access tokens last 15 minutes; refresh with `POST /api/v1/auth/refresh {"refreshToken": "..."}`. Refresh tokens rotate on every use, and reusing an old one signs that person out on all devices.
+
+### Try tracking (T21)
+
+Log in as the driver (the phone added in step 4), then:
+
+```bash
+# Start a trip (consent is required; the truck assigned to the driver is used)
+curl -X POST localhost:8080/api/v1/trips/start -H "Authorization: Bearer $DRIVER_TOKEN" \
+  -H 'Content-Type: application/json' -d '{"consent":true}'
+
+# Upload GPS points (the app sends batches every 30-60 s, or more after losing signal)
+curl -X POST localhost:8080/api/v1/trips/<tripId>/positions -H "Authorization: Bearer $DRIVER_TOKEN" \
+  -H 'Content-Type: application/json' \
+  -d '{"points":[{"ts":"2026-11-19T07:00:00Z","lat":21.4858,"lon":39.1925,"speedMps":8.3,"heading":90}]}'
+
+# Company view: every truck with its live position, "no_signal" or "off_trip"
+curl localhost:8080/api/v1/companies/<orgId>/fleet/live -H "Authorization: Bearer $TOKEN"
+
+# Replay one trip, then end it
+curl localhost:8080/api/v1/companies/<orgId>/trips/<tripId>/track -H "Authorization: Bearer $TOKEN"
+curl -X POST localhost:8080/api/v1/trips/<tripId>/end -H "Authorization: Bearer $DRIVER_TOKEN"
+```
+
+GPS points are kept for `Tracking__RetentionDays` (default 7); trips silent for `Tracking__StaleTripHours` (default 12) are ended automatically.
+

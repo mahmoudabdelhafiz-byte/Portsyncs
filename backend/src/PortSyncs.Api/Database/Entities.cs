@@ -91,6 +91,32 @@ public sealed class RefreshToken
     public DateTimeOffset CreatedAt { get; set; }
 }
 
+public sealed class Trip
+{
+    public Guid Id { get; set; }
+    public Guid OrganizationId { get; set; }
+    public Guid TruckId { get; set; }
+    public Guid DriverId { get; set; }
+    public Guid UserId { get; set; }
+    public string Status { get; set; } = TripStatus.Active;
+    public DateTimeOffset ConsentAt { get; set; }
+    public DateTimeOffset StartedAt { get; set; }
+    public DateTimeOffset? EndedAt { get; set; }
+    public string? EndReason { get; set; }
+    public DateTimeOffset? LastTs { get; set; }
+    public double? LastLat { get; set; }
+    public double? LastLon { get; set; }
+    public float? LastSpeedMps { get; set; }
+    public float? LastHeading { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
+}
+
+public static class TripStatus
+{
+    public const string Active = "active";
+    public const string Ended = "ended";
+}
+
 public static class OrganizationTypes
 {
     public const string TruckingCompany = "trucking_company";

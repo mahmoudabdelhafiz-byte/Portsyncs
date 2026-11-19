@@ -9,6 +9,7 @@ using PortSyncs.Api.Infrastructure.Maps;
 using PortSyncs.Api.Infrastructure.Sms;
 using PortSyncs.Api.Modules.Auth;
 using PortSyncs.Api.Modules.Fleet;
+using PortSyncs.Api.Modules.Tracking;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +21,10 @@ var connectionString = builder.Configuration.GetConnectionString("Postgres");
 if (string.IsNullOrWhiteSpace(connectionString))
     throw new InvalidOperationException("ConnectionStrings__Postgres is required.");
 builder.Services.AddDbContext<PortSyncsDbContext>(o => o.UseNpgsql(connectionString));
+
+// --- Tracking (T21) --------------------------------------------------------
+builder.Services.AddSingleton(builder.Configuration.GetSection("Tracking").Get<TrackingOptions>() ?? new TrackingOptions());
+builder.Services.AddHostedService<TrackingMaintenanceService>();
 
 // --- Login (T20) -----------------------------------------------------------
 var authOptions = builder.Configuration.GetSection("Auth").Get<AuthOptions>() ?? new AuthOptions();
@@ -99,6 +104,7 @@ tools.MapGet("/navigate", (double lat, double lon, NavigationApp target, IMapPro
 
 app.MapAuth();
 app.MapFleet();
+app.MapTracking();
 
 app.Run();
 

@@ -48,13 +48,13 @@ Gates:
 | T18 | UX design: trucking company portal | UX | To do | High | | |
 | T19 | UX design: depot portal (terminal portal later) | UX | To do | High | | |
 | T20 | Driver registration and login (phone OTP), truck plate, company link | Driver app | In progress | High | T16, T17 | API done (`Modules/Auth`, SMS stub); app screens and real SMS provider pending |
-| T21 | Trip mode with consent-based location sharing | Driver app | To do | High | T20, T07 | |
+| T21 | Trip mode with consent-based location sharing | Driver app | In progress | High | T20, T07 | API done (`Modules/Tracking`): trips, GPS upload, daily partitions, 7-day retention; app screens pending |
 | T22 | Push notifications | Driver app | To do | High | T20 | |
 | T23 | Navigation hand-off to the Google Maps or Waze app | Driver app | To do | Medium | T20 | No in-app map cost |
 | T24 | Case inbox: view violations and damages, reply | Driver app | To do | High | T14, T20 | |
 | T25 | Multi-language UI with right-to-left support (Arabic and English first) | Driver app | To do | High | T17 | Languages are country settings (T64) |
 | T26 | Company sign-up, fleet and driver management | Company portal | In progress | High | T16, T18 | API in `Modules/Fleet`, behind login; portal UI pending |
-| T27 | Live fleet map (free up to 10–15 trucks, 7-day history) | Company portal | To do | High | T21, T26 | |
+| T27 | Live fleet map (free up to 10–15 trucks, 7-day history) | Company portal | In progress | High | T21, T26 | API done (`/fleet/live`, trip track); map UI pending |
 | T28 | Case management: acknowledge, accept or dispute with evidence | Company portal | To do | High | T14, T26 | |
 | T29 | Dispatcher users and escalation contacts | Company portal | To do | High | T26 | |
 | T30 | Truck lookup by plate and QR code (depots first) | Depot portal | To do | High | T13, T19 | |
