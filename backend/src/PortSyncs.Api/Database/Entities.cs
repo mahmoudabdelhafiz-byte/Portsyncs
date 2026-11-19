@@ -111,6 +111,80 @@ public sealed class Trip
     public DateTimeOffset CreatedAt { get; set; }
 }
 
+public sealed class Facility
+{
+    public Guid Id { get; set; }
+    public string Type { get; set; } = FacilityTypes.Depot;
+    public string Name { get; set; } = "";
+    public string Country { get; set; } = "";
+    public string? City { get; set; }
+    public string? Address { get; set; }
+    public double? Lat { get; set; }
+    public double? Lon { get; set; }
+    public int? RadiusM { get; set; }
+    public Guid? OperatorOrgId { get; set; }
+    public string Status { get; set; } = "active";
+    public DateTimeOffset CreatedAt { get; set; }
+}
+
+public sealed class ExpectedVisit
+{
+    public Guid Id { get; set; }
+    public Guid FacilityId { get; set; }
+    public Guid TruckingOrgId { get; set; }
+    public Guid? TruckId { get; set; }
+    public string? ContainerNumber { get; set; }
+    public string Purpose { get; set; } = "";
+    public DateTimeOffset WindowFrom { get; set; }
+    public DateTimeOffset WindowTo { get; set; }
+    public string Status { get; set; } = "expected";
+    public Guid CreatedBy { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
+}
+
+public sealed class FacilityVisit
+{
+    public Guid Id { get; set; }
+    public Guid FacilityId { get; set; }
+    public Guid? TruckId { get; set; }
+    public string PlateCountry { get; set; } = "";
+    public string PlateNormalized { get; set; } = "";
+    public Guid? TruckingOrgId { get; set; }
+    public Guid? ExpectedVisitId { get; set; }
+    public string? ContainerIn { get; set; }
+    public string? ContainerOut { get; set; }
+    public DateTimeOffset GateInAt { get; set; }
+    public DateTimeOffset? GateOutAt { get; set; }
+    public string Method { get; set; } = "manual";
+    public Guid? RecordedInBy { get; set; }
+    public Guid? RecordedOutBy { get; set; }
+    public string? Note { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
+}
+
+public sealed class AuditEntry
+{
+    public long Id { get; set; }
+    public DateTimeOffset Ts { get; set; }
+    public Guid? UserId { get; set; }
+    public Guid? OrganizationId { get; set; }
+    public string Action { get; set; } = "";
+    public string Entity { get; set; } = "";
+    public string? EntityId { get; set; }
+    public string? Detail { get; set; }
+}
+
+public static class FacilityTypes
+{
+    public const string Depot = "depot";
+    public const string Terminal = "terminal";
+}
+
+public static class VisitPurposes
+{
+    public static readonly string[] All = ["empty_pickup", "empty_return", "full_pickup", "full_delivery"];
+}
+
 public static class TripStatus
 {
     public const string Active = "active";

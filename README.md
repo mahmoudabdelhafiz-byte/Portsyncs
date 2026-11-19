@@ -103,3 +103,37 @@ curl -X POST localhost:8080/api/v1/trips/<tripId>/end -H "Authorization: Bearer 
 
 GPS points are kept for `Tracking__RetentionDays` (default 7); trips silent for `Tracking__StaleTripHours` (default 12) are ended automatically.
 
+### Try the depot side (T30, T52)
+
+```bash
+# A depot admin signs up the depot (after logging in with their own phone)
+curl -X POST localhost:8080/api/v1/depots -H "Authorization: Bearer $DEPOT_TOKEN" -H 'Content-Type: application/json' \
+  -d '{"name":"Red Sea Depot","country":"SA","city":"Jeddah","lat":21.45,"lon":39.17,"radiusM":300}'
+
+# Add a gate officer (they log in with this phone and find the role ready)
+curl -X POST localhost:8080/api/v1/organizations/<depotOrgId>/members -H "Authorization: Bearer $DEPOT_TOKEN" \
+  -H 'Content-Type: application/json' -d '{"phone":"+966500000003","name":"Gate 1","role":"gate_officer"}'
+
+# The trucking company finds the depot and pre-announces an empty return
+curl "localhost:8080/api/v1/facilities?country=SA&q=red" -H "Authorization: Bearer $TOKEN"
+curl -X POST localhost:8080/api/v1/companies/<orgId>/expected-visits -H "Authorization: Bearer $TOKEN" \
+  -H 'Content-Type: application/json' \
+  -d '{"facilityId":"<facilityId>","truckId":"<truckId>","containerNumber":"MSKU0496560","purpose":"empty_return","windowFrom":"2026-11-19T06:00:00Z","windowTo":"2026-11-19T12:00:00Z"}'
+
+# At the gate: look up the truck by plate (or ?qr=<token>), then gate it in and out
+curl "localhost:8080/api/v1/depots/<depotOrgId>/lookup?plateCountry=SA&plate=1234%20ABC" -H "Authorization: Bearer $DEPOT_TOKEN"
+curl -X POST localhost:8080/api/v1/depots/<depotOrgId>/facilities/<facilityId>/gate-in -H "Authorization: Bearer $DEPOT_TOKEN" \
+  -H 'Content-Type: application/json' -d '{"plateCountry":"SA","plate":"1234 ABC","containerNumber":"MSKU0496560"}'
+curl -X POST localhost:8080/api/v1/depots/<depotOrgId>/facilities/<facilityId>/visits/<visitId>/gate-out \
+  -H "Authorization: Bearer $DEPOT_TOKEN" -H 'Content-Type: application/json' -d '{}'
+
+# Depot screens: today's expected trucks, trucks inside now
+curl localhost:8080/api/v1/depots/<depotOrgId>/facilities/<facilityId>/expected -H "Authorization: Bearer $DEPOT_TOKEN"
+curl "localhost:8080/api/v1/depots/<depotOrgId>/facilities/<facilityId>/visits?inside=true" -H "Authorization: Bearer $DEPOT_TOKEN"
+
+# The trucking company sees its trucks' gate log with time inside
+curl localhost:8080/api/v1/companies/<orgId>/gate-log -H "Authorization: Bearer $TOKEN"
+```
+
+Gate-in links itself to the matching pre-announcement (same truck or container, window near now). The lookup shows the depot only the company name, plate and driver's first name, and every lookup is written to the audit log.
+

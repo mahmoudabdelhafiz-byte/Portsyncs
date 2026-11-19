@@ -8,7 +8,9 @@ using PortSyncs.Api.Infrastructure;
 using PortSyncs.Api.Infrastructure.Maps;
 using PortSyncs.Api.Infrastructure.Sms;
 using PortSyncs.Api.Modules.Auth;
+using PortSyncs.Api.Modules.Depots;
 using PortSyncs.Api.Modules.Fleet;
+using PortSyncs.Api.Modules.Organizations;
 using PortSyncs.Api.Modules.Tracking;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -105,6 +107,9 @@ tools.MapGet("/navigate", (double lat, double lon, NavigationApp target, IMapPro
 app.MapAuth();
 app.MapFleet();
 app.MapTracking();
+app.MapMembers();
+app.MapDepots();
+app.MapCompanyVisits();
 
 app.Run();
 

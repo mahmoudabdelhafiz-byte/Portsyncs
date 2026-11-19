@@ -56,8 +56,8 @@ Gates:
 | T26 | Company sign-up, fleet and driver management | Company portal | In progress | High | T16, T18 | API in `Modules/Fleet`, behind login; portal UI pending |
 | T27 | Live fleet map (free up to 10–15 trucks, 7-day history) | Company portal | In progress | High | T21, T26 | API done (`/fleet/live`, trip track); map UI pending |
 | T28 | Case management: acknowledge, accept or dispute with evidence | Company portal | To do | High | T14, T26 | |
-| T29 | Dispatcher users and escalation contacts | Company portal | To do | High | T26 | |
-| T30 | Truck lookup by plate and QR code (depots first) | Depot portal | To do | High | T13, T19 | |
+| T29 | Dispatcher users and escalation contacts | Company portal | In progress | High | T26 | Staff API done (`Modules/Organizations`); escalation contacts come with T34 |
+| T30 | Truck lookup by plate and QR code (depots first) | Depot portal | In progress | High | T13, T19 | API done (`/depots/{id}/lookup`, audit-logged); depot UI pending |
 | T31 | QR sticker generation per truck | Depot portal | To do | Medium | T26 | |
 | T33 | Digital EIR: gate-in/out condition photos and damage marks confirmed by driver and depot | Depot portal | To do | Medium | T14, T52 | Key depot feature; replaces paper EIRs |
 | T34 | Escalation engine: driver, dispatcher, manager with timers and audit log | Platform | To do | High | T29, T30 | |
@@ -69,7 +69,7 @@ Gates:
 | T41 | Publish apps on Google Play and App Store | QA & launch | To do | High | T03, T40 | |
 | T42 | Pilot with 1–2 depots and 5–10 trucking companies | QA & launch | To do | High | T11, T41, T78 | **Gate 1** |
 | T45 | Container tracking via direct DCSA carrier APIs (free), cached and shared across users | Integration | To do | High | T12, T81 | Self-serve keys: CMA CGM, Hapag-Lloyd; also Maersk, ONE |
-| T52 | Depot portal: gate log, expected trucks, empty pickups and returns | Depot portal | To do | High | T13, T19 | |
+| T52 | Depot portal: gate log, expected trucks, empty pickups and returns | Depot portal | In progress | High | T13, T19 | API done (`Modules/Depots`): depot sign-up, pre-announcements, gate-in/out; depot UI pending |
 | T64 | Country configuration: languages, RTL, units, time zones, date formats, currencies, plate formats | Architecture | To do | High | T13 | Settings, not code |
 | T67 | Maps provider layer with fallback where Google Maps is restricted | Platform | To do | Medium | T23 | Interface scaffolded in T75 |
 | T75 | Dockerize backend, env-var config, interfaces for storage, queue, cache and maps | Architecture | In progress | High | T15 | Scaffold in `backend/` and `deploy/` |
