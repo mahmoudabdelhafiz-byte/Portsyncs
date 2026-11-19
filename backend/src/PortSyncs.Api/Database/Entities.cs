@@ -67,6 +67,30 @@ public sealed class TruckAssignment
     public DateTimeOffset? ToAt { get; set; }
 }
 
+public sealed class OtpChallenge
+{
+    public Guid Id { get; set; }
+    public string Phone { get; set; } = "";
+    public string CodeHash { get; set; } = "";
+    public int Attempts { get; set; }
+    public DateTimeOffset ExpiresAt { get; set; }
+    public DateTimeOffset? ConsumedAt { get; set; }
+    public string? ClientIp { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
+}
+
+public sealed class RefreshToken
+{
+    public Guid Id { get; set; }
+    public Guid UserId { get; set; }
+    public string TokenHash { get; set; } = "";
+    public string? DeviceName { get; set; }
+    public DateTimeOffset ExpiresAt { get; set; }
+    public DateTimeOffset? RevokedAt { get; set; }
+    public Guid? ReplacedBy { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
+}
+
 public static class OrganizationTypes
 {
     public const string TruckingCompany = "trucking_company";

@@ -45,28 +45,36 @@ Redis and RabbitMQ start only with `docker compose --profile full up`, once thei
 
 The API applies the SQL migrations in `backend/src/PortSyncs.Api/Database/Migrations/` on startup.
 
-### Try the fleet API (T26), local only
+### Try login (T20) and the fleet API (T26)
 
-Set `DEV_ENDPOINTS=true` in `deploy/.env`. These endpoints have no login yet (T20), so **never enable them on a server with real data**.
+With `SMS_PROVIDER=Console` the login code is printed in the API log (`docker compose logs api`) instead of being sent by SMS.
 
 ```bash
-# Sign up a trucking company
-curl -X POST localhost:8080/api/v1/companies -H 'Content-Type: application/json' \
-  -d '{"name":"Al Noor Transport","country":"SA","adminName":"Ahmed","adminPhone":"+966501234567"}'
+# 1. Ask for a code, then read it from the log
+curl -X POST localhost:8080/api/v1/auth/otp/request -H 'Content-Type: application/json' \
+  -d '{"phone":"+966501234567"}'
 
-# Add a truck and a driver (use the id returned above)
-curl -X POST localhost:8080/api/v1/companies/<orgId>/trucks -H 'Content-Type: application/json' \
-  -d '{"plateCountry":"SA","plate":"1234 ABC"}'
-curl -X POST localhost:8080/api/v1/companies/<orgId>/drivers -H 'Content-Type: application/json' \
-  -d '{"name":"Ali","phone":"+966500000001"}'
+# 2. Exchange the code for tokens (name is used on first login)
+curl -X POST localhost:8080/api/v1/auth/otp/verify -H 'Content-Type: application/json' \
+  -d '{"phone":"+966501234567","code":"123456","name":"Ahmed","deviceName":"curl"}'
+TOKEN=<accessToken from the answer>
 
-# Assign the driver to the truck
-curl -X POST localhost:8080/api/v1/companies/<orgId>/trucks/<truckId>/assign -H 'Content-Type: application/json' \
-  -d '{"driverId":"<driverId>"}'
+# 3. Create a trucking company (you become its admin)
+curl -X POST localhost:8080/api/v1/companies -H "Authorization: Bearer $TOKEN" \
+  -H 'Content-Type: application/json' -d '{"name":"Al Noor Transport","country":"SA"}'
+
+# 4. Add a truck and a driver, then assign them
+curl -X POST localhost:8080/api/v1/companies/<orgId>/trucks -H "Authorization: Bearer $TOKEN" \
+  -H 'Content-Type: application/json' -d '{"plateCountry":"SA","plate":"1234 ABC"}'
+curl -X POST localhost:8080/api/v1/companies/<orgId>/drivers -H "Authorization: Bearer $TOKEN" \
+  -H 'Content-Type: application/json' -d '{"name":"Ali","phone":"+966500000001"}'
+curl -X POST localhost:8080/api/v1/companies/<orgId>/trucks/<truckId>/assign -H "Authorization: Bearer $TOKEN" \
+  -H 'Content-Type: application/json' -d '{"driverId":"<driverId>"}'
+
+# 5. Who am I, and which companies am I in?
+curl localhost:8080/api/v1/me -H "Authorization: Bearer $TOKEN"
 ```
 
-## Principles
+When the driver (+966500000001) logs in with their own code, they are linked to the company automatically with the `driver` role.
 
-- **Portable from day one:** all settings in environment variables; storage, queue, cache and maps behind interfaces, so moving from the VPS (H1) to Azure/AWS (H2/H3) is a redeploy.
-- **Worldwide by design:** country differences are settings, not code; national systems are connectors.
-- **Privacy:** location only during active trips; facilities see a truck only while it has business with them.
+Access tokens last 15 minutes; refresh with `POST /api/v1/auth/refresh {"refreshToken": "..."}`. Refresh tokens rotate on every use, and reusing an old one signs that person out on all devices.

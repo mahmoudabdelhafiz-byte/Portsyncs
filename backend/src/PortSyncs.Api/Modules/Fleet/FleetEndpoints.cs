@@ -4,40 +4,45 @@ using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using PortSyncs.Api.Database;
 using PortSyncs.Api.Domain;
+using PortSyncs.Api.Modules.Auth;
 
 namespace PortSyncs.Api.Modules.Fleet;
 
 /// <summary>
 /// T26: trucking company sign-up, trucks and drivers.
-/// Until login (T20) exists these endpoints are only mapped when Features__DevEndpoints=true.
+/// Requires login (T20); access per company is checked against memberships (T16).
 /// </summary>
 public static partial class FleetEndpoints
 {
     public static void MapFleet(this IEndpointRouteBuilder app)
     {
-        var companies = app.MapGroup("/api/v1/companies").WithTags("Fleet");
+        // Any signed-in user can create a trucking company and becomes its admin.
+        app.MapPost("/api/v1/companies", SignUp).WithTags("Fleet").RequireAuthorization();
 
-        companies.MapPost("/", SignUp);
-        companies.MapGet("/{orgId:guid}", GetCompany);
-        companies.MapPost("/{orgId:guid}/trucks", AddTruck);
-        companies.MapGet("/{orgId:guid}/trucks", ListTrucks);
-        companies.MapPost("/{orgId:guid}/drivers", AddDriver);
-        companies.MapGet("/{orgId:guid}/drivers", ListDrivers);
-        companies.MapPost("/{orgId:guid}/trucks/{truckId:guid}/assign", AssignDriver);
+        // Everything about one company requires an admin or dispatcher of that company.
+        var company = app.MapGroup("/api/v1/companies/{orgId:guid}").WithTags("Fleet")
+            .RequireOrgRole(Roles.CompanyAdmin, Roles.Dispatcher);
+
+        company.MapGet("/", GetCompany);
+        company.MapPost("/trucks", AddTruck);
+        company.MapGet("/trucks", ListTrucks);
+        company.MapPost("/drivers", AddDriver);
+        company.MapGet("/drivers", ListDrivers);
+        company.MapPost("/trucks/{truckId:guid}/assign", AssignDriver);
     }
 
-    public sealed record SignUpRequest(string Name, string Country, string AdminName, string AdminPhone, string? Locale);
+    public sealed record SignUpRequest(string Name, string Country);
     public sealed record AddTruckRequest(string PlateCountry, string Plate);
     public sealed record AddDriverRequest(string Name, string Phone, string? LicenceNo, string? LicenceCountry);
     public sealed record AssignRequest(Guid DriverId);
 
-    private static async Task<IResult> SignUp(SignUpRequest req, PortSyncsDbContext db, CancellationToken ct)
+    private static async Task<IResult> SignUp(SignUpRequest req, HttpContext http, PortSyncsDbContext db, CancellationToken ct)
     {
+        if (http.User.UserId() is not { } userId) return Results.Unauthorized();
+
         var errors = new Dictionary<string, string[]>();
         if (string.IsNullOrWhiteSpace(req.Name) || req.Name.Trim().Length < 2) errors["name"] = ["Company name is required."];
         if (!IsCountry(req.Country)) errors["country"] = ["Use a two-letter ISO country code, e.g. SA."];
-        if (string.IsNullOrWhiteSpace(req.AdminName)) errors["adminName"] = ["Admin name is required."];
-        if (!IsPhone(req.AdminPhone)) errors["adminPhone"] = ["Use international format, e.g. +966501234567."];
         if (errors.Count > 0) return Results.ValidationProblem(errors);
 
         await using var tx = await db.Database.BeginTransactionAsync(ct);
@@ -49,21 +54,13 @@ public static partial class FleetEndpoints
             Country = req.Country.ToUpperInvariant(),
         };
         db.Organizations.Add(org);
-
-        // A person signs in with one phone number across all the companies they work with.
-        var user = await db.Users.FirstOrDefaultAsync(u => u.Phone == req.AdminPhone, ct);
-        if (user is null)
-        {
-            user = new User { Phone = req.AdminPhone, Name = req.AdminName.Trim(), Locale = req.Locale ?? "en" };
-            db.Users.Add(user);
-        }
         await db.SaveChangesAsync(ct);
 
-        db.Memberships.Add(new Membership { UserId = user.Id, OrganizationId = org.Id, Role = Roles.CompanyAdmin });
+        db.Memberships.Add(new Membership { UserId = userId, OrganizationId = org.Id, Role = Roles.CompanyAdmin });
         await db.SaveChangesAsync(ct);
         await tx.CommitAsync(ct);
 
-        return Results.Created($"/api/v1/companies/{org.Id}", new { org.Id, org.Name, org.Country, adminUserId = user.Id });
+        return Results.Created($"/api/v1/companies/{org.Id}", new { org.Id, org.Name, org.Country, role = Roles.CompanyAdmin });
     }
 
     private static async Task<IResult> GetCompany(Guid orgId, PortSyncsDbContext db, CancellationToken ct)

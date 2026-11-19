@@ -11,6 +11,8 @@ public sealed class PortSyncsDbContext(DbContextOptions<PortSyncsDbContext> opti
     public DbSet<Driver> Drivers => Set<Driver>();
     public DbSet<Truck> Trucks => Set<Truck>();
     public DbSet<TruckAssignment> TruckAssignments => Set<TruckAssignment>();
+    public DbSet<OtpChallenge> OtpChallenges => Set<OtpChallenge>();
+    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
     protected override void OnModelCreating(ModelBuilder model)
     {
@@ -20,6 +22,8 @@ public sealed class PortSyncsDbContext(DbContextOptions<PortSyncsDbContext> opti
         model.Entity<Driver>().ToTable("drivers");
         model.Entity<Truck>().ToTable("trucks");
         model.Entity<TruckAssignment>().ToTable("truck_assignments");
+        model.Entity<OtpChallenge>().ToTable("otp_challenges");
+        model.Entity<RefreshToken>().ToTable("refresh_tokens");
 
         // The schema is owned by the SQL migrations: map every column to snake_case
         // and let the database fill ids and timestamps.
@@ -43,6 +47,8 @@ public sealed class PortSyncsDbContext(DbContextOptions<PortSyncsDbContext> opti
         model.Entity<Driver>().Property(o => o.Id).HasDefaultValueSql("gen_random_uuid()");
         model.Entity<Truck>().Property(o => o.Id).HasDefaultValueSql("gen_random_uuid()");
         model.Entity<TruckAssignment>().Property(o => o.Id).HasDefaultValueSql("gen_random_uuid()");
+        model.Entity<OtpChallenge>().Property(o => o.Id).HasDefaultValueSql("gen_random_uuid()");
+        model.Entity<RefreshToken>().Property(o => o.Id).HasDefaultValueSql("gen_random_uuid()");
         model.Entity<TruckAssignment>().Property(o => o.FromAt).HasDefaultValueSql("now()");
     }
 

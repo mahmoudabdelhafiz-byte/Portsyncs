@@ -14,7 +14,8 @@ services:
       Storage__LocalRoot: /data/files
       Messaging__Provider: InProcess
       Database__MigrateOnStartup: "true"
-      Features__DevEndpoints: ${DEV_ENDPOINTS:-false}
+      Auth__JwtSigningKey: ${AUTH_JWT_SIGNING_KEY:?Set AUTH_JWT_SIGNING_KEY in .env}
+      Sms__Provider: ${SMS_PROVIDER:-Console}
     volumes:
       - files:/data/files
     depends_on:
