@@ -174,6 +174,75 @@ public sealed class AuditEntry
     public string? Detail { get; set; }
 }
 
+public sealed class FileRecord
+{
+    public Guid Id { get; set; }
+    public Guid? OrganizationId { get; set; }
+    public string StorageKey { get; set; } = "";
+    public string ContentType { get; set; } = "";
+    public long SizeBytes { get; set; }
+    public string Sha256 { get; set; } = "";
+    public DateTimeOffset? RetentionUntil { get; set; }
+    public Guid? UploadedBy { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
+}
+
+public sealed class Eir
+{
+    public Guid Id { get; set; }
+    public long Number { get; set; }
+    public Guid FacilityVisitId { get; set; }
+    public Guid FacilityId { get; set; }
+    public Guid? TruckingOrgId { get; set; }
+    public string ContainerNumber { get; set; } = "";
+    public string Direction { get; set; } = "in";
+    public string Condition { get; set; } = "sound";
+    public string? SealNumber { get; set; }
+    public string? Remarks { get; set; }
+    public string Status { get; set; } = EirStatus.Draft;
+    public Guid RecordedBy { get; set; }
+    public DateTimeOffset? IssuedAt { get; set; }
+    public Guid? DriverUserId { get; set; }
+    public DateTimeOffset? DriverRespondedAt { get; set; }
+    public string? DriverComment { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
+}
+
+public sealed class EirDamageMark
+{
+    public Guid Id { get; set; }
+    public Guid EirId { get; set; }
+    public string Side { get; set; } = "";
+    public string? Position { get; set; }
+    public string DamageType { get; set; } = "";
+    public string? Note { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
+}
+
+public sealed class EirPhoto
+{
+    public Guid EirId { get; set; }
+    public Guid FileId { get; set; }
+    public string Party { get; set; } = "facility";
+    public string? Side { get; set; }
+    public Guid AddedBy { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
+}
+
+public static class EirStatus
+{
+    public const string Draft = "draft";
+    public const string Issued = "issued";
+    public const string Confirmed = "confirmed";
+    public const string Disputed = "disputed";
+}
+
+public static class EirVocabulary
+{
+    public static readonly string[] Sides = ["front", "rear", "left", "right", "roof", "floor", "door", "interior"];
+    public static readonly string[] DamageTypes = ["dent", "hole", "cut", "bent", "rust", "crack", "missing_part", "dirty", "other"];
+}
+
 public static class FacilityTypes
 {
     public const string Depot = "depot";

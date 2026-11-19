@@ -18,6 +18,10 @@ public sealed class PortSyncsDbContext(DbContextOptions<PortSyncsDbContext> opti
     public DbSet<ExpectedVisit> ExpectedVisits => Set<ExpectedVisit>();
     public DbSet<FacilityVisit> FacilityVisits => Set<FacilityVisit>();
     public DbSet<AuditEntry> AuditLog => Set<AuditEntry>();
+    public DbSet<FileRecord> Files => Set<FileRecord>();
+    public DbSet<Eir> Eirs => Set<Eir>();
+    public DbSet<EirDamageMark> EirDamageMarks => Set<EirDamageMark>();
+    public DbSet<EirPhoto> EirPhotos => Set<EirPhoto>();
 
     protected override void OnModelCreating(ModelBuilder model)
     {
@@ -35,6 +39,10 @@ public sealed class PortSyncsDbContext(DbContextOptions<PortSyncsDbContext> opti
         model.Entity<FacilityVisit>().ToTable("facility_visits");
         model.Entity<AuditEntry>().ToTable("audit_log");
         model.Entity<AuditEntry>().Property(a => a.Detail).HasColumnType("jsonb");
+        model.Entity<FileRecord>().ToTable("files");
+        model.Entity<Eir>().ToTable("eirs");
+        model.Entity<EirDamageMark>().ToTable("eir_damage_marks");
+        model.Entity<EirPhoto>().ToTable("eir_photos").HasKey(p => new { p.EirId, p.FileId });
 
         // The schema is owned by the SQL migrations: map every column to snake_case
         // and let the database fill ids and timestamps.
@@ -65,6 +73,10 @@ public sealed class PortSyncsDbContext(DbContextOptions<PortSyncsDbContext> opti
         model.Entity<ExpectedVisit>().Property(o => o.Id).HasDefaultValueSql("gen_random_uuid()");
         model.Entity<FacilityVisit>().Property(o => o.Id).HasDefaultValueSql("gen_random_uuid()");
         model.Entity<AuditEntry>().Property(o => o.Id).UseIdentityAlwaysColumn();
+        model.Entity<FileRecord>().Property(o => o.Id).HasDefaultValueSql("gen_random_uuid()");
+        model.Entity<Eir>().Property(o => o.Id).HasDefaultValueSql("gen_random_uuid()");
+        model.Entity<Eir>().Property(o => o.Number).UseIdentityAlwaysColumn();
+        model.Entity<EirDamageMark>().Property(o => o.Id).HasDefaultValueSql("gen_random_uuid()");
         model.Entity<TruckAssignment>().Property(o => o.FromAt).HasDefaultValueSql("now()");
     }
 

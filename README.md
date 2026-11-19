@@ -137,3 +137,32 @@ curl localhost:8080/api/v1/companies/<orgId>/gate-log -H "Authorization: Bearer 
 
 Gate-in links itself to the matching pre-announcement (same truck or container, window near now). The lookup shows the depot only the company name, plate and driver's first name, and every lookup is written to the audit log.
 
+### Try the digital EIR (T33)
+
+```bash
+# 1. The gate officer uploads photos (multipart; jpeg/png/webp/heic, max 10 MB each)
+curl -X POST localhost:8080/api/v1/organizations/<depotOrgId>/files -H "Authorization: Bearer $DEPOT_TOKEN" \
+  -F "file=@left-side.jpg"
+
+# 2. Record the EIR for a gate visit (container defaults to the one entered at gate-in)
+curl -X POST localhost:8080/api/v1/depots/<depotOrgId>/facilities/<facilityId>/visits/<visitId>/eirs \
+  -H "Authorization: Bearer $DEPOT_TOKEN" -H 'Content-Type: application/json' -d '{
+    "direction":"in", "condition":"damaged", "sealNumber":"SL123456",
+    "marks":[{"side":"left","position":"panel 3 from door","damageType":"dent"}],
+    "photos":[{"fileId":"<fileId>","side":"left"}]}'
+
+# 3. Issue it (a damaged EIR needs at least one mark and one photo); it is then locked
+curl -X POST localhost:8080/api/v1/depots/<depotOrgId>/eirs/<eirId>/issue -H "Authorization: Bearer $DEPOT_TOKEN"
+
+# 4. The driver sees it, then confirms or disputes it with a comment and their own photos
+curl localhost:8080/api/v1/eirs/pending -H "Authorization: Bearer $DRIVER_TOKEN"
+curl -X POST localhost:8080/api/v1/eirs/<eirId>/confirm -H "Authorization: Bearer $DRIVER_TOKEN"
+curl -X POST localhost:8080/api/v1/eirs/<eirId>/dispute -H "Authorization: Bearer $DRIVER_TOKEN" \
+  -H 'Content-Type: application/json' -d '{"comment":"Dent was already there at pickup","photos":[{"fileId":"<driverFileId>"}]}'
+
+# 5. The trucking company sees all EIRs of its trucks; photos open via /api/v1/files/<fileId>
+curl localhost:8080/api/v1/companies/<orgId>/eirs -H "Authorization: Bearer $TOKEN"
+```
+
+Behind Nginx, allow uploads with `client_max_body_size 12m;`.
+

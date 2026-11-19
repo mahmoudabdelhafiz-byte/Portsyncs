@@ -59,11 +59,11 @@ Gates:
 | T29 | Dispatcher users and escalation contacts | Company portal | In progress | High | T26 | Staff API done (`Modules/Organizations`); escalation contacts come with T34 |
 | T30 | Truck lookup by plate and QR code (depots first) | Depot portal | In progress | High | T13, T19 | API done (`/depots/{id}/lookup`, audit-logged); depot UI pending |
 | T31 | QR sticker generation per truck | Depot portal | To do | Medium | T26 | |
-| T33 | Digital EIR: gate-in/out condition photos and damage marks confirmed by driver and depot | Depot portal | To do | Medium | T14, T52 | Key depot feature; replaces paper EIRs |
+| T33 | Digital EIR: gate-in/out condition photos and damage marks confirmed by driver and depot | Depot portal | In progress | Medium | T14, T52 | API done (`Modules/Eirs`): draft, issue, driver confirm/dispute; depot and app screens pending |
 | T34 | Escalation engine: driver, dispatcher, manager with timers and audit log | Platform | To do | High | T29, T30 | |
 | T35 | Masked contact: call relay and in-app chat | Platform | To do | High | T34 | |
 | T37 | Barmageyat admin back office | Platform | To do | Medium | T16 | |
-| T38 | Evidence storage, retention rules and audit log | Platform | To do | High | T14, T07 | |
+| T38 | Evidence storage, retention rules and audit log | Platform | In progress | High | T14, T07 | File upload with type check, hash and access control done (`Modules/Files`); retention rules pending |
 | T39 | Cost caps for maps, chatbot and hosting in free tier | Platform | To do | Medium | T09 | |
 | T40 | Security review and penetration test | QA & launch | To do | High | | Before pilot |
 | T41 | Publish apps on Google Play and App Store | QA & launch | To do | High | T03, T40 | |

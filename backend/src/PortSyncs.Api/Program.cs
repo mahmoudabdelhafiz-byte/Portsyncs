@@ -9,6 +9,8 @@ using PortSyncs.Api.Infrastructure.Maps;
 using PortSyncs.Api.Infrastructure.Sms;
 using PortSyncs.Api.Modules.Auth;
 using PortSyncs.Api.Modules.Depots;
+using PortSyncs.Api.Modules.Eirs;
+using PortSyncs.Api.Modules.Files;
 using PortSyncs.Api.Modules.Fleet;
 using PortSyncs.Api.Modules.Organizations;
 using PortSyncs.Api.Modules.Tracking;
@@ -110,6 +112,8 @@ app.MapTracking();
 app.MapMembers();
 app.MapDepots();
 app.MapCompanyVisits();
+app.MapFiles();
+app.MapEirs();
 
 app.Run();
 
